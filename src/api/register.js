@@ -23,6 +23,7 @@ router.post("/register", async (req, res) => {
     email,
     password,
   });
+
   const savedUser = await newUser.save().catch((err) => {
     console.log("Error: ", err);
     res.status(500).json({ error: "Cannot register user at the moment!" });

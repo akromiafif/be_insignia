@@ -13,7 +13,7 @@ router.get("/tweet", async (req, res) => {
     });
 
     if (tweetUser)
-      return res.status(400).json({
+      return res.status(200).json({
         message: "Get tweet information",
         result: tweetUser,
       });
@@ -38,15 +38,17 @@ router.post("/tweet", async (req, res) => {
       like,
       content,
     });
-    const savedUser = await newTweet.save().catch((err) => {
+
+    const savedTweet = await newTweet.save({ transaction: t }).catch((err) => {
       console.log("Error: ", err);
       res.status(500).json({ error: "Cannot tweeting at the moment!" });
     });
 
-    if (savedUser) res.json({ message: "Thanks for tweeting" });
+    if (savedTweet) res.json({ message: "Thanks for tweeting" });
 
-    await t, commit();
+    await t.commit();
   } catch (err) {
+    console.log(err);
     await t.rollback();
   }
 });
@@ -56,9 +58,12 @@ router.delete("/tweet/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
-    const delTweetWithId = await Tweet.destroy({
-      where: { id },
-    }).catch((err) => {
+    const delTweetWithId = await Tweet.destroy(
+      {
+        where: { id },
+      },
+      { transaction: t }
+    ).catch((err) => {
       console.log("Error: ", err);
     });
 
@@ -69,7 +74,7 @@ router.delete("/tweet/:id", async (req, res) => {
       message: "Tweet not found",
     });
 
-    await t, commit();
+    await t.commit();
   } catch (err) {
     await t.rollback();
   }
@@ -79,17 +84,19 @@ router.put("/tweet/:id", async (req, res) => {
   const t = await sequelize.transaction();
   const id = req.params.id;
 
-  const userId = req.body.userId;
   const like = req.body.like;
   const content = req.body.content;
 
   try {
-    const updateTweetById = await Tweet.upsert({
-      id,
-      userId,
-      like,
-      content,
-    }).catch((err) => {
+    const updateTweetById = await Tweet.upsert(
+      {
+        id,
+        like,
+        content,
+      },
+      { where: id },
+      { transaction: t }
+    ).catch((err) => {
       console.log("Error: ", err);
     });
 
@@ -98,12 +105,13 @@ router.put("/tweet/:id", async (req, res) => {
         message: "Update tweet successfully",
       });
 
+    await t.commit();
+
     res.json({
       message: "Tweet not found",
     });
-
-    await t, commit();
   } catch (err) {
+    console.log(err);
     await t.rollback();
   }
 });
@@ -120,7 +128,8 @@ router.patch("/tweet/:id", async (req, res) => {
       },
       {
         where: { id },
-      }
+      },
+      { transaction: t }
     ).catch((err) => {
       console.log("Error: ", err);
     });
@@ -130,11 +139,11 @@ router.patch("/tweet/:id", async (req, res) => {
         message: "Update tweet successfully",
       });
 
+    await t.commit();
+
     res.json({
       message: "Tweet not found",
     });
-
-    await t, commit();
   } catch (err) {
     await t.rollback();
   }
