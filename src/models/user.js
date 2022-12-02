@@ -31,5 +31,5 @@ const User = sequelize.define("User", {
   },
 });
 
-User.hasMany(Tweet, { foreignKey: "userId" });
+User.hasMany(Tweet, { foreignKey: "userId", onDelete: "CASCADE" });
 module.exports = User;

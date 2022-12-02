@@ -70,7 +70,33 @@ router.put("/tweet/:id", async (req, res) => {
 
   if (updateTweetById)
     return res.status(200).json({
-      message: "User tweet successfully",
+      message: "Update tweet successfully",
+    });
+
+  res.json({
+    message: "Tweet not found",
+  });
+});
+
+router.patch("/tweet/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const content = req.body.content;
+
+  const updateTweetById = await Tweet.update(
+    {
+      content,
+    },
+    {
+      where: { id },
+    }
+  ).catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  if (updateTweetById)
+    return res.status(200).json({
+      message: "Update tweet successfully",
     });
 
   res.json({
