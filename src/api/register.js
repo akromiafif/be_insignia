@@ -1,4 +1,5 @@
 const express = require("express");
+const { v4: uuidv4 } = require("uuid");
 const User = require("../models/user");
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.post("/register", async (req, res) => {
   }
 
   const newUser = new User({
+    id: uuidv4(),
     fullName,
     username,
     phoneNumber,
@@ -29,12 +31,6 @@ router.post("/register", async (req, res) => {
   });
 
   if (savedUser) res.json({ message: "Thanks for registering" });
-});
-
-router.get("/test", (req, res) => {
-  res.json({
-    message: "🦄🌈✨👋🌎🌍🌏✨🌈🦄",
-  });
 });
 
 module.exports = router;

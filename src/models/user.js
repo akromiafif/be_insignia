@@ -1,7 +1,13 @@
+const { trimEnd } = require("lodash");
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
 
 const User = sequelize.define("User", {
+  id: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    primaryKey: true,
+  },
   fullName: {
     type: DataTypes.STRING,
     allowNull: false,
