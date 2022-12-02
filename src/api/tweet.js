@@ -1,11 +1,12 @@
 const express = require("express");
-const sequelize = require("sequelize");
+const sequelize = require("../database");
 const Tweet = require("../models/tweet");
-const t = await sequelize.transaction();
 
 const router = express.Router();
 
 router.get("/tweet", async (req, res) => {
+  const t = await sequelize.transaction();
+
   try {
     const tweetUser = await Tweet.findAll({ transaction: t }).catch((err) => {
       console.log("Error: ", err);
@@ -28,6 +29,7 @@ router.get("/tweet", async (req, res) => {
 });
 
 router.post("/tweet", async (req, res) => {
+  const t = await sequelize.transaction();
   const { userId, like, content } = req.body;
 
   try {
@@ -50,6 +52,7 @@ router.post("/tweet", async (req, res) => {
 });
 
 router.delete("/tweet/:id", async (req, res) => {
+  const t = await sequelize.transaction();
   const id = req.params.id;
 
   try {
@@ -73,6 +76,7 @@ router.delete("/tweet/:id", async (req, res) => {
 });
 
 router.put("/tweet/:id", async (req, res) => {
+  const t = await sequelize.transaction();
   const id = req.params.id;
 
   const userId = req.body.userId;
@@ -105,6 +109,7 @@ router.put("/tweet/:id", async (req, res) => {
 });
 
 router.patch("/tweet/:id", async (req, res) => {
+  const t = await sequelize.transaction();
   const id = req.params.id;
   const content = req.body.content;
 
