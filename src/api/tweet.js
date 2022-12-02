@@ -1,8 +1,23 @@
 const express = require("express");
-const { v4: uuidv4 } = require("uuid");
 const Tweet = require("../models/tweet");
 
 const router = express.Router();
+
+router.get("/tweet", async (req, res) => {
+  const tweetUser = await Tweet.findAll().catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  if (tweetUser)
+    return res.status(400).json({
+      message: "Get tweet information",
+      result: tweetUser,
+    });
+
+  res.json({
+    message: "Tweet not found",
+  });
+});
 
 router.post("/tweet", async (req, res) => {
   const { userId, like, content } = req.body;
@@ -18,6 +33,23 @@ router.post("/tweet", async (req, res) => {
   });
 
   if (savedUser) res.json({ message: "Thanks for tweeting" });
+});
+
+router.delete("/tweet/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const delTweetWithId = await Tweet.destroy({
+    where: { id },
+  }).catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  if (delTweetWithId)
+    return res.status(400).json({ message: "Tweet deleted successfully" });
+
+  res.json({
+    message: "Tweet not found",
+  });
 });
 
 module.exports = router;
