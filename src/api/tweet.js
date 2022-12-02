@@ -52,4 +52,30 @@ router.delete("/tweet/:id", async (req, res) => {
   });
 });
 
+router.put("/tweet/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const userId = req.body.userId;
+  const like = req.body.like;
+  const content = req.body.content;
+
+  const updateTweetById = await Tweet.upsert({
+    id,
+    userId,
+    like,
+    content,
+  }).catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  if (updateTweetById)
+    return res.status(200).json({
+      message: "User tweet successfully",
+    });
+
+  res.json({
+    message: "Tweet not found",
+  });
+});
+
 module.exports = router;
