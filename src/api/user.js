@@ -1,5 +1,6 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const Tweet = require("../models/tweet");
 const User = require("../models/user");
 
 const router = express.Router();
@@ -14,10 +15,17 @@ router.get("/user", async (req, res) => {
     console.log("Error: ", err);
   });
 
+  const tweetUser = await Tweet.findAll({
+    where: { userId: result.id },
+  }).catch((err) => {
+    console.log("Error: ", err);
+  });
+
   if (userWithEmail)
-    return res
-      .status(400)
-      .json({ message: "Get user information", result: userWithEmail });
+    return res.status(400).json({
+      message: "Get user information",
+      result: { user: userWithEmail, tweets: tweetUser },
+    });
 
   res.json({
     message: "User not found",

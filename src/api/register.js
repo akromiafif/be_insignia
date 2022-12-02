@@ -1,5 +1,4 @@
 const express = require("express");
-const { v4: uuidv4 } = require("uuid");
 const User = require("../models/user");
 
 const router = express.Router();
@@ -18,7 +17,6 @@ router.post("/register", async (req, res) => {
   }
 
   const newUser = new User({
-    id: uuidv4(),
     fullName,
     username,
     phoneNumber,

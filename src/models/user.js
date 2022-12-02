@@ -1,10 +1,11 @@
-const { trimEnd } = require("lodash");
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
+const Tweet = require("./tweet");
 
 const User = sequelize.define("User", {
   id: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
     allowNull: false,
     primaryKey: true,
   },
@@ -30,4 +31,5 @@ const User = sequelize.define("User", {
   },
 });
 
+User.hasMany(Tweet, { foreignKey: "userId" });
 module.exports = User;
