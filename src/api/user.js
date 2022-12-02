@@ -4,6 +4,26 @@ const User = require("../models/user");
 
 const router = express.Router();
 
+router.get("/user", async (req, res) => {
+  const jwtToken = req.body.access_token;
+  const result = jwt.verify(jwtToken, process.env.JWT_SECRET);
+
+  const userWithEmail = await User.findOne({
+    where: { email: result.email },
+  }).catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  if (userWithEmail)
+    return res
+      .status(400)
+      .json({ message: "Get user information", result: userWithEmail });
+
+  res.json({
+    message: "User not found",
+  });
+});
+
 router.delete("/user", async (req, res) => {
   const jwtToken = req.body.access_token;
   const result = jwt.verify(jwtToken, process.env.JWT_SECRET);
