@@ -1,35 +1,49 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const redisClient = require("../database/redis");
 const Tweet = require("../models/tweet");
 const User = require("../models/user");
 
 const router = express.Router();
 
 router.get("/user", async (req, res) => {
-  const jwtToken = req.headers.authorization.split(" ")[1];
-  const result = jwt.verify(jwtToken, process.env.JWT_SECRET);
+  const cacheUser = await redisClient.get("users");
+  const cacheTweets = await redisClient.get("tweetOfUser");
 
-  const userWithEmail = await User.findOne({
-    where: { email: result.email },
-  }).catch((err) => {
-    console.log("Error: ", err);
-  });
+  if (cacheUser || cacheTweets) {
+    return res.status(200).json({
+      message: "Get user information from cache",
+      result: { user: JSON.parse(cacheUser), tweets: JSON.parse(cacheTweets) },
+    });
+  } else {
+    const jwtToken = req.headers.authorization.split(" ")[1];
+    const result = jwt.verify(jwtToken, process.env.JWT_SECRET);
 
-  const tweetUser = await Tweet.findAll({
-    where: { userId: result.id },
-  }).catch((err) => {
-    console.log("Error: ", err);
-  });
-
-  if (userWithEmail)
-    return res.status(400).json({
-      message: "Get user information",
-      result: { user: userWithEmail, tweets: tweetUser },
+    const userWithEmail = await User.findOne({
+      where: { email: result.email },
+    }).catch((err) => {
+      console.log("Error: ", err);
     });
 
-  res.json({
-    message: "User not found",
-  });
+    const tweetUser = await Tweet.findAll({
+      where: { userId: result.id },
+    }).catch((err) => {
+      console.log("Error: ", err);
+    });
+
+    await redisClient.set("users", JSON.stringify(userWithEmail));
+    await redisClient.set("tweetOfUser", JSON.stringify(tweetUser));
+
+    if (userWithEmail)
+      return res.status(200).json({
+        message: "Get user information",
+        result: { user: userWithEmail, tweets: tweetUser },
+      });
+
+    res.json({
+      message: "User not found",
+    });
+  }
 });
 
 router.delete("/user", async (req, res) => {
