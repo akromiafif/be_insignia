@@ -16,8 +16,6 @@ let redisClient;
 const router = express.Router();
 
 router.get("/tweet", async (req, res) => {
-  const t = await sequelize.transaction();
-
   try {
     const cacheResults = await redisClient.get("allTweets");
 
@@ -27,6 +25,8 @@ router.get("/tweet", async (req, res) => {
         result: JSON.parse(cacheResults),
       });
     } else {
+      const t = await sequelize.transaction();
+
       const tweetUser = await Tweet.findAll({ transaction: t }).catch((err) => {
         console.log("Error: ", err);
       });
