@@ -1,9 +1,17 @@
 const express = require("express");
 const sequelize = require("../database");
 const Tweet = require("../models/tweet");
-const Redis = require("redis");
+const redis = require("redis");
 
-// const redisClient = Redis.createClient({ host: "localhost", port: 6379 });
+let redisClient;
+
+(async () => {
+  redisClient = redis.createClient({ host: "localhost", port: 6379 });
+
+  redisClient.on("error", (error) => console.error(`Error : ${error}`));
+
+  await redisClient.connect();
+})();
 
 const router = express.Router();
 
@@ -11,23 +19,32 @@ router.get("/tweet", async (req, res) => {
   const t = await sequelize.transaction();
 
   try {
-    const tweetUser = await Tweet.findAll({ transaction: t }).catch((err) => {
-      console.log("Error: ", err);
-    });
+    const cacheResults = await redisClient.get("allTweets");
 
-    // redisClient.set("allTweets", JSON.stringify(tweetUser));
-
-    if (tweetUser)
+    if (cacheResults) {
       return res.status(200).json({
-        message: "Get tweet information",
-        result: tweetUser,
+        message: "Get tweet information from cache",
+        result: JSON.parse(cacheResults),
+      });
+    } else {
+      const tweetUser = await Tweet.findAll({ transaction: t }).catch((err) => {
+        console.log("Error: ", err);
       });
 
-    await t.commit();
+      await redisClient.set("allTweets", JSON.stringify(tweetUser));
 
-    res.json({
-      message: "Tweet not found",
-    });
+      if (tweetUser)
+        return res.status(200).json({
+          message: "Get tweet information",
+          result: tweetUser,
+        });
+
+      await t.commit();
+
+      res.json({
+        message: "Tweet not found",
+      });
+    }
   } catch (err) {
     console.log(err);
     await t.rollback();
