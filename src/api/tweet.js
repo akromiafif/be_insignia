@@ -1,17 +1,7 @@
 const express = require("express");
 const sequelize = require("../database");
+const redisClient = require("../database/redis");
 const Tweet = require("../models/tweet");
-const redis = require("redis");
-
-let redisClient;
-
-(async () => {
-  redisClient = redis.createClient({ host: "localhost", port: 6379 });
-
-  redisClient.on("error", (error) => console.error(`Error : ${error}`));
-
-  await redisClient.connect();
-})();
 
 const router = express.Router();
 
