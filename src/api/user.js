@@ -57,7 +57,7 @@ router.delete("/user", async (req, res) => {
   });
 
   if (delUserWithEmail)
-    return res.status(400).json({ message: "User deleted successfully" });
+    return res.status(200).json({ message: "User deleted successfully" });
 
   res.json({
     message: "User not found",

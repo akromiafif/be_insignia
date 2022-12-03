@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
-const User = require("./user");
+const redisClient = require("../database/redis");
 
 const Tweet = sequelize.define("Tweet", {
   id: {
@@ -17,6 +17,10 @@ const Tweet = sequelize.define("Tweet", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+});
+
+Tweet.afterSave(async (tweet, options) => {
+  redisClient.del("allTweets");
 });
 
 module.exports = Tweet;
