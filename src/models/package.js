@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
-const OrderDetail = require("./order-detail");
 
 const Package = sequelize.define("Package", {
   id: {
@@ -27,5 +26,4 @@ const Package = sequelize.define("Package", {
   },
 });
 
-Package.hasOne(OrderDetail, { foreignKey: "packageId" });
 module.exports = Package;
