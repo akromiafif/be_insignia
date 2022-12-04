@@ -20,19 +20,39 @@ router.post("/order-detail", async (req, res) => {
   if (savedPackage) res.json({ message: "Order detail created successfully" });
 });
 
-router.get("/order", async (req, res) => {
-  const allOrder = await Order.findAll().catch((err) => {
+router.get("/order-detail", async (req, res) => {
+  const allOrderDetail = await OrderDetail.findAll().catch((err) => {
     console.log("Error: ", err);
   });
 
-  if (allOrder)
+  if (allOrderDetail)
     return res.status(200).json({
-      message: "Get all orders information",
-      result: allOrder,
+      message: "Get all order detail information",
+      result: allOrderDetail,
     });
 
   res.json({
-    message: "Orders not found",
+    message: "Order details not found",
+  });
+});
+
+router.get("/order-detail/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const orderDetailById = await OrderDetail.findOne({
+    where: { id },
+  }).catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  if (orderDetailById)
+    return res.status(200).json({
+      message: "Get order detail information",
+      result: orderDetailById,
+    });
+
+  res.json({
+    message: "Order detail not found",
   });
 });
 
