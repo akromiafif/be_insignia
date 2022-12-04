@@ -4,7 +4,7 @@ const Customer = require("../models/customer");
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  const { fullName, username, phoneNumber, email, password } = req.body;
+  const { name, address, phoneNumber, email, password } = req.body;
 
   const alreadyExistsUser = await Customer.findOne({ where: { email } }).catch(
     (err) => {
@@ -17,11 +17,11 @@ router.post("/register", async (req, res) => {
   }
 
   const newUser = new Customer({
-    fullName,
-    username,
-    phoneNumber,
+    name,
     email,
     password,
+    address,
+    phoneNumber,
   });
 
   const savedUser = await newUser.save().catch((err) => {
