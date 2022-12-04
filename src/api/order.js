@@ -76,4 +76,23 @@ router.get("/order/customer/:customerId", async (req, res) => {
   });
 });
 
+router.delete("/order/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const orderById = await Order.destroy({
+    where: { id },
+  }).catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  if (orderById)
+    return res.status(200).json({
+      message: "Order deleted successfully",
+    });
+
+  res.json({
+    message: "Order not found",
+  });
+});
+
 module.exports = router;
