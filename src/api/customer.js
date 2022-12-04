@@ -6,35 +6,26 @@ const Customer = require("../models/customer");
 const router = express.Router();
 
 router.get("/user", async (req, res) => {
-  const cacheUser = await redisClient.get("users");
+  const jwtToken = req.headers.authorization.split(" ")[1];
+  const result = jwt.verify(jwtToken, process.env.JWT_SECRET);
 
-  if (cacheUser) {
+  const userWithEmail = await Customer.findOne({
+    where: { email: result.email },
+  }).catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  await redisClient.set("users", JSON.stringify(userWithEmail));
+
+  if (userWithEmail)
     return res.status(200).json({
-      message: "Get user information from cache",
-      result: { user: JSON.parse(cacheUser) },
-    });
-  } else {
-    const jwtToken = req.headers.authorization.split(" ")[1];
-    const result = jwt.verify(jwtToken, process.env.JWT_SECRET);
-
-    const userWithEmail = await Customer.findOne({
-      where: { email: result.email },
-    }).catch((err) => {
-      console.log("Error: ", err);
+      message: "Get user information",
+      result: { user: userWithEmail },
     });
 
-    await redisClient.set("users", JSON.stringify(userWithEmail));
-
-    if (userWithEmail)
-      return res.status(200).json({
-        message: "Get user information",
-        result: { user: userWithEmail },
-      });
-
-    res.json({
-      message: "User not found",
-    });
-  }
+  res.json({
+    message: "User not found",
+  });
 });
 
 router.delete("/user", async (req, res) => {
@@ -59,17 +50,17 @@ router.put("/user", async (req, res) => {
   const jwtToken = req.headers.authorization.split(" ")[1];
   const result = jwt.verify(jwtToken, process.env.JWT_SECRET);
 
-  const fullName = req.body.fullName;
-  const username = req.body.username;
-  const phoneNumber = req.body.phoneNumber;
+  const name = req.body.name;
   const email = req.body.email;
+  const phoneNumber = req.body.phoneNumber;
   const password = req.body.password;
+  const address = req.body.address;
 
   const updateUserWithEmail = await Customer.upsert({
     id: result.id,
-    fullName,
-    username,
+    name,
     phoneNumber,
+    address,
     email,
     password,
   }).catch((err) => {

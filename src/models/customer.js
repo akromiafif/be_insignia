@@ -32,14 +32,24 @@ const Customer = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-  },
-  {
-    hooks: {
-      afterSave: (user, options) => {
-        redisClient.del("users");
-      },
-    },
   }
+  // {
+  //   hooks: {
+  //     afterSave: (user, options) => {
+  //       redisClient.del("users");
+  //     },
+  //     afterDestroy: (user, options) => {
+  //       redisClient.del("users");
+  //     },
+  //     afterUpdate: (user, options) => {
+  //       redisClient.del("users");
+  //     },
+  //     afterUpsert: (user, options) => {
+  //       console.log("afterUpsert");
+  //       redisClient.del("users");
+  //     },
+  //   },
+  // }
 );
 
 Customer.hasMany(Order, { foreignKey: "customerId" });
