@@ -15,8 +15,6 @@ router.get("/user", async (req, res) => {
     console.log("Error: ", err);
   });
 
-  await redisClient.set("users", JSON.stringify(userWithEmail));
-
   if (userWithEmail)
     return res.status(200).json({
       message: "Get user information",
