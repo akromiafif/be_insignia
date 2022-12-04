@@ -56,4 +56,23 @@ router.get("/order-detail/:id", async (req, res) => {
   });
 });
 
+router.delete("/order-detail/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const orderDetailById = await OrderDetail.destroy({
+    where: { id },
+  }).catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  if (orderDetailById)
+    return res.status(200).json({
+      message: "Order detail deleted successfully",
+    });
+
+  res.json({
+    message: "Order detail not found",
+  });
+});
+
 module.exports = router;
