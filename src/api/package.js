@@ -15,7 +15,7 @@ router.post("/package", async (req, res) => {
 
   const savedPackage = await newPackage.save().catch((err) => {
     console.log("Error: ", err);
-    res.status(500).json({ error: "Cannot create package at this timme" });
+    res.status(500).json({ error: "Cannot create package at this time" });
   });
 
   if (savedPackage) res.json({ message: "Package created successfully" });
