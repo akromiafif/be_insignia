@@ -1,19 +1,19 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
-const Tweet = require("./tweet");
+const Order = require("./order");
 
-const User = sequelize.define("User", {
+const Customer = sequelize.define("Customer", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     allowNull: false,
     primaryKey: true,
   },
-  fullName: {
+  name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  username: {
+  address: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -31,5 +31,5 @@ const User = sequelize.define("User", {
   },
 });
 
-User.hasMany(Tweet, { foreignKey: "userId" });
-module.exports = User;
+Customer.hasMany(Order, { foreignKey: "customerId" });
+module.exports = Customer;

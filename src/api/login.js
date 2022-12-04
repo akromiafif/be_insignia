@@ -1,5 +1,5 @@
 const express = require("express");
-const User = require("../models/user");
+const Customer = require("../models/customer");
 const jwt = require("jsonwebtoken");
 
 const router = express.Router();
@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const userWithEmail = await User.findOne({ where: { email } }).catch(
+  const userWithEmail = await Customer.findOne({ where: { email } }).catch(
     (err) => {
       console.log("Error: ", err);
     }

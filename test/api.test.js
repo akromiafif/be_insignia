@@ -72,7 +72,7 @@ describe("POST /api/v1/register", () => {
         fullName: "Test Akromi",
         username: "test",
         phoneNumber: "0931235234",
-        email: "new@gmail.com",
+        email: "asd@gmail.com",
         password: "test123",
       })
       .expect("Content-Type", /json/)

@@ -1,12 +1,12 @@
 const express = require("express");
-const User = require("../models/user");
+const Customer = require("../models/customer");
 
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
   const { fullName, username, phoneNumber, email, password } = req.body;
 
-  const alreadyExistsUser = await User.findOne({ where: { email } }).catch(
+  const alreadyExistsUser = await Customer.findOne({ where: { email } }).catch(
     (err) => {
       console.log("Error: ", err);
     }
@@ -16,7 +16,7 @@ router.post("/register", async (req, res) => {
     return res.status(409).json({ message: "User with email already exists!" });
   }
 
-  const newUser = new User({
+  const newUser = new Customer({
     fullName,
     username,
     phoneNumber,

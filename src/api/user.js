@@ -1,43 +1,34 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const redisClient = require("../database/redis");
-const Tweet = require("../models/tweet");
-const User = require("../models/user");
+const Customer = require("../models/customer");
 
 const router = express.Router();
 
 router.get("/user", async (req, res) => {
   const cacheUser = await redisClient.get("users");
-  const cacheTweets = await redisClient.get("tweetOfUser");
 
-  if (cacheUser || cacheTweets) {
+  if (cacheUser) {
     return res.status(200).json({
       message: "Get user information from cache",
-      result: { user: JSON.parse(cacheUser), tweets: JSON.parse(cacheTweets) },
+      result: { user: JSON.parse(cacheUser) },
     });
   } else {
     const jwtToken = req.headers.authorization.split(" ")[1];
     const result = jwt.verify(jwtToken, process.env.JWT_SECRET);
 
-    const userWithEmail = await User.findOne({
+    const userWithEmail = await Customer.findOne({
       where: { email: result.email },
     }).catch((err) => {
       console.log("Error: ", err);
     });
 
-    const tweetUser = await Tweet.findAll({
-      where: { userId: result.id },
-    }).catch((err) => {
-      console.log("Error: ", err);
-    });
-
     await redisClient.set("users", JSON.stringify(userWithEmail));
-    await redisClient.set("tweetOfUser", JSON.stringify(tweetUser));
 
     if (userWithEmail)
       return res.status(200).json({
         message: "Get user information",
-        result: { user: userWithEmail, tweets: tweetUser },
+        result: { user: userWithEmail },
       });
 
     res.json({
@@ -50,7 +41,7 @@ router.delete("/user", async (req, res) => {
   const jwtToken = req.headers.authorization.split(" ")[1];
   const result = jwt.verify(jwtToken, process.env.JWT_SECRET);
 
-  const delUserWithEmail = await User.destroy({
+  const delUserWithEmail = await Customer.destroy({
     where: { email: result.email },
   }).catch((err) => {
     console.log("Error: ", err);
@@ -74,7 +65,7 @@ router.put("/user", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  const updateUserWithEmail = await User.upsert({
+  const updateUserWithEmail = await Customer.upsert({
     id: result.id,
     fullName,
     username,
@@ -101,7 +92,7 @@ router.patch("/user", async (req, res) => {
 
   const password = req.body.password;
 
-  const updateUserWithEmail = await User.update(
+  const updateUserWithEmail = await Customer.update(
     {
       password,
     },
