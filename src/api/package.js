@@ -57,4 +57,23 @@ router.get("/package/:id", async (req, res) => {
   });
 });
 
+router.delete("/package/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const packageById = await Package.destroy({
+    where: { id },
+  }).catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  if (packageById)
+    return res.status(200).json({
+      message: "Package deleted successfully",
+    });
+
+  res.json({
+    message: "Package not found",
+  });
+});
+
 module.exports = router;
