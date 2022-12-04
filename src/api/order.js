@@ -56,4 +56,24 @@ router.get("/order/:id", async (req, res) => {
   });
 });
 
+router.get("/order/customer/:customerId", async (req, res) => {
+  const customerId = req.params.customerId;
+
+  const orderByCustomerId = await Order.findAll({
+    where: { customerId },
+  }).catch((err) => {
+    console.log("Error: ", err);
+  });
+
+  if (orderByCustomerId)
+    return res.status(200).json({
+      message: "Get order by customer information",
+      result: orderByCustomerId,
+    });
+
+  res.json({
+    message: "Order by customer not found",
+  });
+});
+
 module.exports = router;
