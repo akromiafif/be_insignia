@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const redisClient = require("../database/redis");
 const Customer = require("../models/customer");
+const Order = require("../models/order");
 
 const router = express.Router();
 
@@ -11,6 +11,7 @@ router.get("/user", async (req, res) => {
 
   const userWithEmail = await Customer.findOne({
     where: { email: result.email },
+    include: Order,
   }).catch((err) => {
     console.log("Error: ", err);
   });
